@@ -1,3 +1,8 @@
+WIFI_CONFIG.py
+.DS*
+.vscode
+.micropico
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
