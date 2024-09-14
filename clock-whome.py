@@ -6,7 +6,7 @@ from pngdec import PNG
 letterSpacing = 2
 
 display = badger2040.Badger2040()
-display.set_update_speed(2)
+display.set_update_speed(0)
 display.set_thickness(4)
 
 WIDTH, HEIGHT = display.get_bounds()
@@ -51,11 +51,6 @@ def button(pin):
         machine.reset()
 
 def draw_clock():
-
-    # Real time information
-    timeString = str(hour) + ":" + str(minute)
-    time_width = display.measure_text(timeString, 2.5)
-    time_offset = int((badger2040.WIDTH / 2) - (time_width / 2))
 
     # Clear the display
     display.set_pen(15)
