@@ -17,6 +17,7 @@ if badger2040.is_wireless():
         display.connect()
         if display.isconnected():
             ntptime.settime()
+            badger2040.pico_rtc_to_pcf()
     except (RuntimeError, OSError) as e:
         print(f"Wireless Error: {e.value}")
 else:
