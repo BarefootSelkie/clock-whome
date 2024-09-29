@@ -13,7 +13,10 @@ hsMajorLen = hsMinorLen * 6
 hsSeasonLen = hsMajorLen * 6
 hsCycleLen = hsSeasonLen * 6
 
+nameSeasons = ["Prevernal", "Vernal", "Estival", "Serotinal", "Autumnal", "Hibernal"]
+
 letterSpacing = 2
+hsSpacing = 8
 
 ### Initialisation
 
@@ -99,15 +102,15 @@ def hsTickTohsTimeObject(ticks):
     remainder = ticks
     hsTimeObject[0] = int(ticks // hsCycleLen)
     remainder = ticks % hsCycleLen
-    hsTimeObject[1] = int(remainder // hsSeasonLen) + 1
+    hsTimeObject[1] = int(remainder // hsSeasonLen)
     remainder = ticks % hsSeasonLen
-    hsTimeObject[2] = int(remainder // hsMajorLen) + 1
+    hsTimeObject[2] = int(remainder // hsMajorLen)
     remainder = ticks % hsMajorLen
-    hsTimeObject[3] = int(remainder // hsMinorLen) + 1
+    hsTimeObject[3] = int(remainder // hsMinorLen)
     remainder = ticks % hsMinorLen
-    hsTimeObject[4] = int(remainder // hsFractalLen) + 1
+    hsTimeObject[4] = int(remainder // hsFractalLen)
     remainder = ticks % hsFractalLen
-    hsTimeObject[5] = int(remainder // hsTick) + 1
+    hsTimeObject[5] = int(remainder // hsTick)
 
     return(hsTimeObject)
 
@@ -139,10 +142,23 @@ def draw_clock():
     display.clear()
     display.set_pen(0)
 
-    display.text(str(hsTimeTen(hsTimeNow(zeropoint))), 0, 113, 0, 1)
+    # Initialise PNG renderer
+    png = PNG(display.display)
 
     # draw the meat space clock
-    png = PNG(display.display)
+
+    days = ((hsTimeNow(zeropoint)[2] + 1) * 6) + hsTimeNow(zeropoint)[3] + 1
+    textString = "{} {}".format(str(days), nameSeasons[hsTimeNow(zeropoint)[1]])
+    textWidth = display.measure_text(textString, 1)
+
+    png.open_file("/clock-hs/fractals28px/" + str(hsTimeNow(zeropoint)[4]) + ".png")
+    fractalWidth = png.get_width()
+    display.text(textString, fractalWidth + hsSpacing, 113, 0, 1)
+    png.decode(0, 96)
+
+    png.open_file("/clock-hs/seasons28px/" + str(hsTimeNow(zeropoint)[1]) + ".png")
+    seasonWidth = png.get_width()
+    png.decode(fractalWidth + hsSpacing + textWidth + hsSpacing, 96)
 
     # draw a colon in the middle of the display
     center = (badger2040.WIDTH / 2)
@@ -192,13 +208,13 @@ draw_clock()
 while True:
     # Load RTC into variables
     year, month, date, wd, hour, minute, second, _ = rtc.datetime()
-    
+
     # Handle BST time zone
     hour = hour + 1
 
     if minute != last_minute:
         draw_clock()
         last_minute = minute
-    
+
     time.sleep(1)
 # mpremote
