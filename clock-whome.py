@@ -3,7 +3,19 @@ import machine
 import badger2040
 from pngdec import PNG
 
+### Constants ###
+
+# Time constants for headspace
+hsTick = 1 # done like this to allow for future adding for smaller units
+hsFractalLen = hsTick * 6
+hsMinorLen = hsFractalLen * 6
+hsMajorLen = hsMinorLen * 6
+hsSeasonLen = hsMajorLen * 6
+hsCycleLen = hsSeasonLen * 6
+
 letterSpacing = 2
+
+### Initialisation
 
 display = badger2040.Badger2040()
 display.set_update_speed(0)
@@ -31,7 +43,25 @@ except RuntimeError:
 
 rtc = machine.RTC()
 
+# Get zeropoint from file
+
+zeropointFile = "zeropoint.txt"
+zeropointDefault = "946684800" # 2000-01-01 00:00
+
+try: 
+    stream = open(zeropointFile, "r")
+except OSError:
+    with open(zeropointFile, "w") as f:
+        f.write(zeropointDefault)
+        f.flush()
+    stream = open(zeropointFile, "r")
+
+# Read in the first line
+zeropoint = int(stream.readline())
+
 display.set_font("sans")
+
+### Badger 2040 button handling ###
 
 button_a = badger2040.BUTTONS[badger2040.BUTTON_A]
 button_b = badger2040.BUTTONS[badger2040.BUTTON_B]
@@ -51,12 +81,65 @@ def button(pin):
     if button_a.value() and button_c.value():
         machine.reset()
 
+for b in badger2040.BUTTONS.values():
+    b.irq(trigger=machine.Pin.IRQ_RISING, handler=button)
+
+
+
+### Functions
+
+# Converts an int of headspace ticks into a headspace date time object
+# returns [cycles, seasons, weeks, days, fractals, ticks]
+def hsTickTohsTimeObject(ticks):
+
+    hsTimeObject = [0,0,0,0,0,0]
+    # Time object is formatted Cycle, Season, Day Major, Day Minor, Fractal, Tick
+    # + 1 added to lines for numbers that should not start counting at 0
+
+    remainder = ticks
+    hsTimeObject[0] = int(ticks // hsCycleLen)
+    remainder = ticks % hsCycleLen
+    hsTimeObject[1] = int(remainder // hsSeasonLen) + 1
+    remainder = ticks % hsSeasonLen
+    hsTimeObject[2] = int(remainder // hsMajorLen) + 1
+    remainder = ticks % hsMajorLen
+    hsTimeObject[3] = int(remainder // hsMinorLen) + 1
+    remainder = ticks % hsMinorLen
+    hsTimeObject[4] = int(remainder // hsFractalLen) + 1
+    remainder = ticks % hsFractalLen
+    hsTimeObject[5] = int(remainder // hsTick) + 1
+
+    return(hsTimeObject)
+
+# Takes in a period of time in seconds and converts it to a number of headspace ticks
+# Designed to work with *datetime.total_seconds()*, returns an int
+def rsSecondToTick(rsSeconds):
+    return(rsSeconds // 400)
+
+# Gets the current time in headspace based on zeropoint in zeropoint.txt
+# returns: [cycles, seasons, day major, day minor, fractals, ticks]
+def hsTimeNow(zeropoint):
+
+    hsNowObj = hsTickTohsTimeObject(
+        rsSecondToTick(
+            time.time() - zeropoint
+        )
+    )
+
+    return (hsNowObj)
+
+def hsTimeTen(hsTimeObject):
+  calcDays = (hsTimeObject[2] * 6) + hsTimeObject[3]
+  return (f"{hsTimeObject[0]:d}-{hsTimeObject[1]:d}-{calcDays:d} {hsTimeObject[4]:d}:{hsTimeObject[5]:d}")
+
 def draw_clock():
 
     # Clear the display
     display.set_pen(15)
     display.clear()
     display.set_pen(0)
+
+    display.text(str(hsTimeTen(hsTimeNow(zeropoint))), 0, 113, 0, 1)
 
     # Draw the new information on the screen
     png = PNG(display.display)
@@ -89,12 +172,8 @@ def draw_clock():
     hourMSBLeft = hourLSBLeft - (letterSpacing + hourMSBWidth)
     png.decode(int(hourMSBLeft), 0)
 
-    #display.text(timeString, time_offset, 80, 0, 2.5)
-
     display.update()
 
-for b in badger2040.BUTTONS.values():
-    b.irq(trigger=machine.Pin.IRQ_RISING, handler=button)
 
 year, month, date, wd, hour, minute, second, _ = rtc.datetime()
 # Handle BST time zone

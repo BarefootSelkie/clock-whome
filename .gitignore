@@ -2,6 +2,7 @@ WIFI_CONFIG.py
 .DS*
 .vscode
 .micropico
+zeropoint.txt
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
