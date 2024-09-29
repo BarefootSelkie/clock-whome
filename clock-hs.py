@@ -15,8 +15,9 @@ hsCycleLen = hsSeasonLen * 6
 
 nameSeasons = ["Prevernal", "Vernal", "Estival", "Serotinal", "Autumnal", "Hibernal"]
 
-letterSpacing = 2
-hsSpacing = 8
+rsLetterSpacing = 2
+hsLetterSpacing = 1
+hsSpaceWidth = 8
 
 ### Initialisation
 
@@ -149,28 +150,45 @@ def draw_clock():
     # draw the meat space clock
 
     # Work out what text we need to display
-    days = ((hsTimeNow(zeropoint)[2] + 1) * 6) + hsTimeNow(zeropoint)[3] + 1
-    textString = "{} {}".format(str(days), nameSeasons[hsTimeNow(zeropoint)[1]])
-
     # Measure all the things to display
-    textWidth = display.measure_text(textString, 1)
+    dayString = str(((hsTimeNow(zeropoint)[2] + 1) * 6) + hsTimeNow(zeropoint)[3] + 1)
+    png.open_file("/clock-hs/numerals28px/" + dayString[0] + ".png")
+    dayMsbWidth = png.get_width()
+    png.open_file("/clock-hs/numerals28px/" + dayString[1] + ".png")
+    dayLsbWidth = png.get_width()
+    png.open_file("/clock-hs/seasonNames28px/" + str(hsTimeNow(zeropoint)[1]) + ".png")
+    seasonNameWidth = png.get_width()
     png.open_file("/clock-hs/fractals28px/" + str(hsTimeNow(zeropoint)[4]) + ".png")
     fractalWidth = png.get_width()
     png.open_file("/clock-hs/seasons28px/" + str(hsTimeNow(zeropoint)[1]) + ".png")
     seasonWidth = png.get_width()
-    totalWidth = fractalWidth + hsSpacing + textWidth + hsSpacing + seasonWidth 
+    totalWidth = fractalWidth + hsSpaceWidth + dayMsbWidth + hsLetterSpacing + dayLsbWidth + hsSpaceWidth + seasonNameWidth + hsSpaceWidth + seasonWidth 
 
     # Work out where to start drawing if everything is centred
     hsStart = int(CENTRE - (totalWidth / 2))
 
     # Draw the images and text for the headspace datetime
-    display.text(textString, hsStart + fractalWidth + hsSpacing, 113, 0, 1)
-    
+
+    cursor = hsStart
+
     png.open_file("/clock-hs/fractals28px/" + str(hsTimeNow(zeropoint)[4]) + ".png")
-    png.decode(hsStart, 96)
+    png.decode(cursor, 96)
+    cursor = cursor + png.get_width() + hsSpaceWidth
+
+    png.open_file("/clock-hs/numerals28px/" + dayString[0] + ".png")
+    png.decode(cursor, 96)
+    cursor = cursor + png.get_width() + hsLetterSpacing
+
+    png.open_file("/clock-hs/numerals28px/" + dayString[1] + ".png")
+    png.decode(cursor, 96)
+    cursor = cursor + png.get_width() + hsSpaceWidth
+
+    png.open_file("/clock-hs/seasonNames28px/" + str(hsTimeNow(zeropoint)[1]) + ".png")
+    png.decode(cursor, 96)
+    cursor = cursor + png.get_width() + hsSpaceWidth
 
     png.open_file("/clock-hs/seasons28px/" + str(hsTimeNow(zeropoint)[1]) + ".png")
-    png.decode(hsStart + fractalWidth + hsSpacing + textWidth + hsSpacing, 96)
+    png.decode(cursor, 96)
 
     # draw a colon in the middle of the display
     png.open_file("/clock-hs/numerals96px/colon.png")
@@ -184,25 +202,25 @@ def draw_clock():
     # draw the minutes msb
     png.open_file("/clock-hs/numerals96px/" + str(timeString[2]) + ".png")
     minuteMSBWidth = png.get_width()
-    minuteMSBLeft = colonLeft + colonWidth + letterSpacing
+    minuteMSBLeft = colonLeft + colonWidth + rsLetterSpacing
     png.decode(int(minuteMSBLeft), 0)
 
     # draw the minutes lsb
     png.open_file("/clock-hs/numerals96px/" + str(timeString[3]) + ".png")
     minuteLSBWidth = png.get_width()
-    minuteLSBLeft = minuteMSBLeft + minuteMSBWidth + letterSpacing
+    minuteLSBLeft = minuteMSBLeft + minuteMSBWidth + rsLetterSpacing
     png.decode(int(minuteLSBLeft), 0)
 
     # draw the hour lsb
     png.open_file("/clock-hs/numerals96px/" + str(timeString[1]) + ".png")
     hourLSBWidth = png.get_width()
-    hourLSBLeft = colonLeft - (letterSpacing + hourLSBWidth)
+    hourLSBLeft = colonLeft - (rsLetterSpacing + hourLSBWidth)
     png.decode(int(hourLSBLeft), 0)
 
     # draw the hour msb
     png.open_file("/clock-hs/numerals96px/" + str(timeString[0]) + ".png")
     hourMSBWidth = png.get_width()
-    hourMSBLeft = hourLSBLeft - (letterSpacing + hourMSBWidth)
+    hourMSBLeft = hourLSBLeft - (rsLetterSpacing + hourMSBWidth)
     png.decode(int(hourMSBLeft), 0)
 
     # send the image to the eink display hardward to display it on screen
