@@ -25,6 +25,7 @@ display.set_update_speed(0)
 display.set_thickness(4)
 
 WIDTH, HEIGHT = display.get_bounds()
+CENTRE = (badger2040.WIDTH / 2)
 
 if badger2040.is_wireless():
     import ntptime
@@ -147,24 +148,34 @@ def draw_clock():
 
     # draw the meat space clock
 
+    # Work out what text we need to display
     days = ((hsTimeNow(zeropoint)[2] + 1) * 6) + hsTimeNow(zeropoint)[3] + 1
     textString = "{} {}".format(str(days), nameSeasons[hsTimeNow(zeropoint)[1]])
-    textWidth = display.measure_text(textString, 1)
 
+    # Measure all the things to display
+    textWidth = display.measure_text(textString, 1)
     png.open_file("/clock-hs/fractals28px/" + str(hsTimeNow(zeropoint)[4]) + ".png")
     fractalWidth = png.get_width()
-    display.text(textString, fractalWidth + hsSpacing, 113, 0, 1)
-    png.decode(0, 96)
-
     png.open_file("/clock-hs/seasons28px/" + str(hsTimeNow(zeropoint)[1]) + ".png")
     seasonWidth = png.get_width()
-    png.decode(fractalWidth + hsSpacing + textWidth + hsSpacing, 96)
+    totalWidth = fractalWidth + hsSpacing + textWidth + hsSpacing + seasonWidth 
+
+    # Work out where to start drawing if everything is centred
+    hsStart = int(CENTRE - (totalWidth / 2))
+
+    # Draw the images and text for the headspace datetime
+    display.text(textString, hsStart + fractalWidth + hsSpacing, 113, 0, 1)
+    
+    png.open_file("/clock-hs/fractals28px/" + str(hsTimeNow(zeropoint)[4]) + ".png")
+    png.decode(hsStart, 96)
+
+    png.open_file("/clock-hs/seasons28px/" + str(hsTimeNow(zeropoint)[1]) + ".png")
+    png.decode(hsStart + fractalWidth + hsSpacing + textWidth + hsSpacing, 96)
 
     # draw a colon in the middle of the display
-    center = (badger2040.WIDTH / 2)
     png.open_file("/clock-hs/numerals96px/colon.png")
     colonWidth = png.get_width()
-    colonLeft = center - (colonWidth / 2)
+    colonLeft = int(CENTRE - (colonWidth / 2))
     png.decode(int(colonLeft), -10)
 
     # get the time in the correct format
