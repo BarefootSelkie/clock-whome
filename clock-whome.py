@@ -141,37 +141,44 @@ def draw_clock():
 
     display.text(str(hsTimeTen(hsTimeNow(zeropoint))), 0, 113, 0, 1)
 
-    # Draw the new information on the screen
+    # draw the meat space clock
     png = PNG(display.display)
 
+    # draw a colon in the middle of the display
     center = (badger2040.WIDTH / 2)
-    png.open_file("/clock-hs/numerals/colon.png")
+    png.open_file("/clock-hs/numerals96px/colon.png")
     colonWidth = png.get_width()
     colonLeft = center - (colonWidth / 2)
     png.decode(int(colonLeft), -10)
 
+    # get the time in the correct format
     timeString = "{:02}{:02}:".format(hour, minute)
 
-    png.open_file("/clock-hs/numerals/" + str(timeString[2]) + ".png")
+    # draw the minutes msb
+    png.open_file("/clock-hs/numerals96px/" + str(timeString[2]) + ".png")
     minuteMSBWidth = png.get_width()
     minuteMSBLeft = colonLeft + colonWidth + letterSpacing
     png.decode(int(minuteMSBLeft), 0)
 
-    png.open_file("/clock-hs/numerals/" + str(timeString[3]) + ".png")
+    # draw the minutes lsb
+    png.open_file("/clock-hs/numerals96px/" + str(timeString[3]) + ".png")
     minuteLSBWidth = png.get_width()
     minuteLSBLeft = minuteMSBLeft + minuteMSBWidth + letterSpacing
     png.decode(int(minuteLSBLeft), 0)
 
-    png.open_file("/clock-hs/numerals/" + str(timeString[1]) + ".png")
+    # draw the hour lsb
+    png.open_file("/clock-hs/numerals96px/" + str(timeString[1]) + ".png")
     hourLSBWidth = png.get_width()
     hourLSBLeft = colonLeft - (letterSpacing + hourLSBWidth)
     png.decode(int(hourLSBLeft), 0)
 
-    png.open_file("/clock-hs/numerals/" + str(timeString[0]) + ".png")
+    # draw the hour msb
+    png.open_file("/clock-hs/numerals96px/" + str(timeString[0]) + ".png")
     hourMSBWidth = png.get_width()
     hourMSBLeft = hourLSBLeft - (letterSpacing + hourMSBWidth)
     png.decode(int(hourMSBLeft), 0)
 
+    # send the image to the eink display hardward to display it on screen
     display.update()
 
 
