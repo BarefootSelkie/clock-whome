@@ -145,9 +145,7 @@ def draw_clock():
     # Initialise PNG renderer
     png = PNG(display.display)
 
-    # draw the meat space clock
-
-    # Work out what text we need to display
+    # Draw Heaspace time / date
     # Measure all the things to display
     dayString = str(((hsTimeNow(zeropoint)[2]) * 6) + hsTimeNow(zeropoint)[3] + 1)
     png.open_file("/clock-hs/fractals28px/" + str(hsTimeNow(zeropoint)[4]) + ".png")
@@ -167,8 +165,7 @@ def draw_clock():
     # Work out where to start drawing if everything is centred
     hsStart = int(CENTRE - (totalWidth / 2))
 
-    # Draw the images and text for the headspace datetime
-
+    # Draw the images and text for the headspace time/date
     cursor = hsStart
 
     png.open_file("/clock-hs/fractals28px/" + str(hsTimeNow(zeropoint)[4]) + ".png")
@@ -194,6 +191,8 @@ def draw_clock():
     png.open_file("/clock-hs/seasons28px/" + str(hsTimeNow(zeropoint)[1]) + ".png")
     png.decode(cursor, 96)
 
+    # Draw the meat space clock
+    
     # draw a colon in the middle of the display
     png.open_file("/clock-hs/numerals96px/colon.png")
     colonWidth = png.get_width()
