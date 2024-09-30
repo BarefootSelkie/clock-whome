@@ -5,6 +5,8 @@ from pngdec import PNG
 
 ### Constants ###
 
+summerTime = True
+
 # Time constants for headspace
 hsTick = 1 # done like this to allow for future adding for smaller units
 hsFractalLen = hsTick * 6
@@ -192,7 +194,7 @@ def draw_clock():
     png.decode(cursor, 96)
 
     # Draw the meat space clock
-    
+
     # draw a colon in the middle of the display
     png.open_file("/clock-hs/numerals96px/colon.png")
     colonWidth = png.get_width()
@@ -200,7 +202,10 @@ def draw_clock():
     png.decode(int(colonLeft), -10)
 
     # get the time in the correct format
-    timeString = "{:02}{:02}:".format(hour, minute)
+    if not summerTime:
+        timeString = "{:02}{:02}:".format(hour, minute)
+    else:
+        timeString = "{:02}{:02}:".format(((hour + 1) % 24), minute)
 
     # draw the minutes msb
     png.open_file("/clock-hs/numerals96px/" + str(timeString[2]) + ".png")
@@ -231,8 +236,6 @@ def draw_clock():
 
 
 year, month, date, wd, hour, minute, second, _ = rtc.datetime()
-# Handle BST time zone
-hour = hour + 1
 
 last_minute = minute
 draw_clock()
@@ -240,9 +243,6 @@ draw_clock()
 while True:
     # Load RTC into variables
     year, month, date, wd, hour, minute, second, _ = rtc.datetime()
-
-    # Handle BST time zone
-    hour = hour + 1
 
     if minute != last_minute:
         draw_clock()
