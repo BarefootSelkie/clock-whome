@@ -13,8 +13,6 @@ hsMajorLen = hsMinorLen * 6
 hsSeasonLen = hsMajorLen * 6
 hsCycleLen = hsSeasonLen * 6
 
-nameSeasons = ["Prevernal", "Vernal", "Estival", "Serotinal", "Autumnal", "Hibernal"]
-
 rsLetterSpacing = 2
 hsLetterSpacing = 1
 hsSpaceWidth = 8
@@ -151,18 +149,20 @@ def draw_clock():
 
     # Work out what text we need to display
     # Measure all the things to display
-    dayString = str(((hsTimeNow(zeropoint)[2] + 1) * 6) + hsTimeNow(zeropoint)[3] + 1)
+    dayString = str(((hsTimeNow(zeropoint)[2]) * 6) + hsTimeNow(zeropoint)[3] + 1)
+    png.open_file("/clock-hs/fractals28px/" + str(hsTimeNow(zeropoint)[4]) + ".png")
+    fractalWidth = png.get_width()
+    png.open_file("/clock-hs/ticks28px/" + str(hsTimeNow(zeropoint)[5]) + ".png")
+    tickWidth = png.get_width()
     png.open_file("/clock-hs/numerals28px/" + dayString[0] + ".png")
     dayMsbWidth = png.get_width()
     png.open_file("/clock-hs/numerals28px/" + dayString[1] + ".png")
     dayLsbWidth = png.get_width()
     png.open_file("/clock-hs/seasonNames28px/" + str(hsTimeNow(zeropoint)[1]) + ".png")
     seasonNameWidth = png.get_width()
-    png.open_file("/clock-hs/fractals28px/" + str(hsTimeNow(zeropoint)[4]) + ".png")
-    fractalWidth = png.get_width()
     png.open_file("/clock-hs/seasons28px/" + str(hsTimeNow(zeropoint)[1]) + ".png")
     seasonWidth = png.get_width()
-    totalWidth = fractalWidth + hsSpaceWidth + dayMsbWidth + hsLetterSpacing + dayLsbWidth + hsSpaceWidth + seasonNameWidth + hsSpaceWidth + seasonWidth 
+    totalWidth = fractalWidth + hsLetterSpacing + tickWidth + hsSpaceWidth + dayMsbWidth + hsLetterSpacing + dayLsbWidth + hsSpaceWidth + seasonNameWidth + hsSpaceWidth + seasonWidth 
 
     # Work out where to start drawing if everything is centred
     hsStart = int(CENTRE - (totalWidth / 2))
@@ -172,6 +172,10 @@ def draw_clock():
     cursor = hsStart
 
     png.open_file("/clock-hs/fractals28px/" + str(hsTimeNow(zeropoint)[4]) + ".png")
+    png.decode(cursor, 96)
+    cursor = cursor + png.get_width() + hsLetterSpacing
+
+    png.open_file("/clock-hs/ticks28px/" + str(hsTimeNow(zeropoint)[5]) + ".png")
     png.decode(cursor, 96)
     cursor = cursor + png.get_width() + hsSpaceWidth
 
