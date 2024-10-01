@@ -148,21 +148,24 @@ def draw_clock():
     png = PNG(display.display)
 
     # Draw Heaspace time / date
-    # Measure all the things to display
+    # Create a sting holding the current day of season in base 10
     dayString = str(((hsTimeNow(zeropoint)[2]) * 6) + hsTimeNow(zeropoint)[3] + 1)
+    totalWidth = 0
+
+    # Measure all the things to display
     png.open_file("/clock-hs/fractals28px/" + str(hsTimeNow(zeropoint)[4]) + ".png")
-    fractalWidth = png.get_width()
+    totalWidth = totalWidth + png.get_width() + hsLetterSpacing
     png.open_file("/clock-hs/ticks28px/" + str(hsTimeNow(zeropoint)[5]) + ".png")
-    tickWidth = png.get_width()
+    totalWidth = totalWidth + png.get_width() + hsSpaceWidth
     png.open_file("/clock-hs/numerals28px/" + dayString[0] + ".png")
-    dayMsbWidth = png.get_width()
-    png.open_file("/clock-hs/numerals28px/" + dayString[1] + ".png")
-    dayLsbWidth = png.get_width()
+    totalWidth = totalWidth + png.get_width() + hsSpaceWidth
+    if len(dayString) > 1:
+        png.open_file("/clock-hs/numerals28px/" + dayString[1] + ".png")
+        totalWidth = totalWidth + png.get_width() + hsLetterSpacing
     png.open_file("/clock-hs/seasonNames28px/" + str(hsTimeNow(zeropoint)[1]) + ".png")
-    seasonNameWidth = png.get_width()
+    totalWidth = totalWidth + png.get_width() + hsSpaceWidth
     png.open_file("/clock-hs/seasons28px/" + str(hsTimeNow(zeropoint)[1]) + ".png")
-    seasonWidth = png.get_width()
-    totalWidth = fractalWidth + hsLetterSpacing + tickWidth + hsSpaceWidth + dayMsbWidth + hsLetterSpacing + dayLsbWidth + hsSpaceWidth + seasonNameWidth + hsSpaceWidth + seasonWidth 
+    totalWidth = totalWidth + png.get_width()
 
     # Work out where to start drawing if everything is centred
     hsStart = int(CENTRE - (totalWidth / 2))
@@ -180,11 +183,14 @@ def draw_clock():
 
     png.open_file("/clock-hs/numerals28px/" + dayString[0] + ".png")
     png.decode(cursor, 96)
-    cursor = cursor + png.get_width() + hsLetterSpacing
+    cursor = cursor + png.get_width() 
 
-    png.open_file("/clock-hs/numerals28px/" + dayString[1] + ".png")
-    png.decode(cursor, 96)
-    cursor = cursor + png.get_width() + hsSpaceWidth
+    if len(dayString) > 1:
+        png.open_file("/clock-hs/numerals28px/" + dayString[1] + ".png")
+        png.decode(cursor, 96)
+        cursor = cursor + hsLetterSpacing + png.get_width()
+        
+    cursor = cursor + hsSpaceWidth
 
     png.open_file("/clock-hs/seasonNames28px/" + str(hsTimeNow(zeropoint)[1]) + ".png")
     png.decode(cursor, 96)
